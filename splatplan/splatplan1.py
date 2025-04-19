@@ -54,7 +54,7 @@ class SplatPlan():
         path = self.gsplat_voxel.create_path(x0, xf)
 
         # torch.cuda.synchronize()
-        # time_astar = time.time() - tnow
+        time_astar = time.time() - tnow
 
         # times_collision_set = 0
         # times_polytope = 0

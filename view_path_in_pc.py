@@ -2,7 +2,7 @@ import open3d as o3d
 import numpy as np
 
 # --- Configuration ---
-test_name = "splatnav_test/"
+test_name = "vicon_small/"
 test_dir = "outputs/" + test_name
 
 # Load point cloud
@@ -12,8 +12,11 @@ pcd = o3d.io.read_point_cloud(test_dir + "mesh.ply")
 path = np.load(test_dir + "path_astar_2d.npy")
 
 # Bounding box from PyTorch tensors
-bbox_min = lower_bound = np.array([-1.33, -0.5, -0.17])     ## from 'flight' example =  mac_schw lab 
-bbox_max = np.array([1, 0.5, 0.26])  # Example min
+# bbox_min = lower_bound = np.array([-1.33, -0.5, -0.17])     ## from 'flight' example =  mac_schw lab 
+# bbox_max = np.array([1, 0.5, 0.26])  # Example min
+
+bbox_min = np.array([-1, -1, -0.4])     ## from 'flight' example =  mac_schw lab 
+bbox_max = np.array([1, 1, -0.05])  # Example min
 
 # Filter point cloud within the bounding box
 pcd_points = np.asarray(pcd.points)

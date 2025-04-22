@@ -15,21 +15,25 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 torch.manual_seed(0)
 np.random.seed(0)
 
-test_name = "splatnav_test/"
+test_name = "vicon_small/"
 mapping = False
 
-path_to_GSplat = Path("outputs/" + test_name + "gemsplat/2025-04-17_024254/config.yml")       
+path_to_GSplat = Path("outputs/" + test_name + "splatfacto/2025-04-22_005347/config.yml")       
 # path_to_GSplat = Path("/splats/outputs/splatnav_test/splatfacto/2025-04-08_183001/config.yml")
-lower_bound = torch.tensor([-1.33, -0.5, -0.1], device=device)     ## from 'flight' example =  mac_schw lab 
-upper_bound = torch.tensor([1, 0.5, 0.26], device=device)           ## from 'flight' example =  mac_schw lab
-resolution = torch.tensor([1100, 1100, 1], device=device)           ## in mac_schw lab it is int(100), but can be a torch.tensor vector (3,)
+# lower_bound = torch.tensor([-1.33, -0.5, -0.1], device=device)     ## from 'flight' example =  mac_schw lab 
+# upper_bound = torch.tensor([1, 0.5, 0.26], device=device)           ## from 'flight' example =  mac_schw lab
+
+lower_bound = torch.tensor([-1, -1, -0.4], device=device)     ## from 'flight' example =  mac_schw lab 
+upper_bound = torch.tensor([1, 1, -0.05], device=device)           ## from 'flight' example =  mac_schw lab
+
+resolution = torch.tensor([100, 100, 25], device=device)           ## in mac_schw lab it is int(100), but can be a torch.tensor vector (3,)
 voxel_config = {
                 'lower_bound': lower_bound,
                 'upper_bound': upper_bound,
                 'resolution': resolution
                }
 
-robot_radius = 0.02
+robot_radius = 0.06
 robot_config = {'radius': robot_radius}
 
 tnow = time.time()
@@ -44,8 +48,14 @@ if mapping:
 
 planner = SplatPlan(gsplat, robot_config, voxel_config, device)
 
-x = torch.tensor([-1.25, 0, -0.12], device=device)            ## start (current pose of car)
-goal = torch.tensor([0.15, 0.35, -0.12], device=device)          ## goal
+# x = torch.tensor([-1.25, 0, -0.12], device=device)            ## start (current pose of car)
+# goal = torch.tensor([0.15, 0.35, -0.12], device=device)          ## goal
+
+x = torch.tensor([0.5, 0., -0.35], device=device)            ## start (current pose of car)
+goal = torch.tensor([-0.5, 0.5, -0.35], device=device)          ## goal
+
+
+
 
 output = planner.generate_path(x, goal)     ## add some code in this or before this to ensure that the path generated can be traversed by the vehicle
 

@@ -1,5 +1,7 @@
+2d_ackermann_plan
 2d_splatplan_ros
 header
 publish_pcl
+semantic_2d_plan_ros
 semantic_splatplan_ros
 splatplan_ros

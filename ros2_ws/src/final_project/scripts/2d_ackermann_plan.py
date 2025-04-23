@@ -19,9 +19,30 @@ from nav_msgs.msg import OccupancyGrid
 import torch
 from pathlib import Path
 import numpy as np
+# import tf_transformations
+from scipy.spatial.transform import Rotation as R
 
 # from splat.splat_utils import GSplatLoader
 # from splatplan.splatplan1 import SplatPlan
+
+
+import heapq
+import math
+
+class HybridNode:
+    def __init__(self, x, y, yaw, g_cost=0.0, h_cost=0.0, parent=None):
+        self.x = x
+        self.y = y
+        self.yaw = yaw
+        self.g_cost = g_cost
+        self.h_cost = h_cost
+        self.f_cost = g_cost + h_cost
+        self.parent = parent
+
+    def __lt__(self, other):  # Needed for heapq
+        return self.f_cost < other.f_cost
+
+
 
 
 class SplatPlanner2DNode(Node):
@@ -74,72 +95,98 @@ class SplatPlanner2DNode(Node):
 
     def map_callback(self, msg):
         data = np.array(msg.data, dtype=np.int8).reshape(msg.info.height, msg.info.width)
-        self.occ_map = (data == 0).astype(np.uint8)  # free = 0, occupied = 100, unknown = -1
+        binary_map = (data == 0).astype(np.uint8)  # free = 0, occupied = 100, unknown = -1
+        free_ratio = np.mean(binary_map)
+        print(free_ratio)
+        car_radius = 0.3  # meters (adjust to your car’s clearance)
+        inflation_radius = int(car_radius / msg.info.resolution)
+
+        structure = np.ones((2 * inflation_radius + 1, 2 * inflation_radius + 1), dtype=np.uint8)
+        inflated = binary_dilation(binary_map == 0, structure=structure)
+
+        # Free cells = 1, Obstacle cells = 0
+        self.occ_map = (~inflated).astype(np.uint8)
+        free_ratio = np.mean(self.occ_map)
+        print(free_ratio)
         self.resolution = msg.info.resolution
         self.origin = (msg.info.origin.position.x, msg.info.origin.position.y) 
         self.get_logger().info("Received and processed map from /map topic.")
 
-    def run_astar_scikit(self, start, goal, occ_map, resolution, buffer=0.3):
-        def map_to_pixel(coords):
-            x = coords[1]
-            y = coords[0]
-            x_or = self.origin[1]
-            y_or = self.origin[0]
-            x_pix = int((x - x_or) / self.resolution)
-            y_pix = int((y - y_or) / self.resolution)
-            return (x_pix, y_pix)
 
-        def pixel_to_map(pixel):
-            x_pix = pixel[0]
-            y_pix = pixel[1]
-            x_or = self.origin[0]
-            y_or = self.origin[1]
-            x = float((x_pix * self.resolution) + x_or)
-            y = float((y_pix * self.resolution) + y_or)
-            return (x, y)
+    def run_hybrid_astar(self, start, goal, occ_map, resolution, origin, wheelbase=0.3):
+        steering_angles = np.linspace(-0.52, 0.52, 30)
+        directions = [0.0707]  # forward only
+        goal_tolerance = 0.2
 
-        start_px = map_to_pixel(start)
-        goal_px = map_to_pixel(goal)
-        print("Start:", start, "->", start_px)
-        print("Goal:", goal, "->", goal_px)
+        def map_to_world(px, py):
+            return (px * resolution + origin[0], py * resolution + origin[1])
 
-        # Inflate obstacles
-        expansion_radius = int(buffer / self.resolution)
-        binary_obstacles = occ_map == 0  # 0 = occupied in your logic
-        structure = np.ones((2 * expansion_radius + 1, 2 * expansion_radius + 1), dtype=bool)
-        inflated = binary_dilation(binary_obstacles, structure=structure)
+        def world_to_map(x, y):
+            return int((x - origin[0]) / resolution), int((y - origin[1]) / resolution)
 
-        # Cost map
-        cost_map = np.where(inflated, 1e6, 1.0).astype(np.float32)
+        def is_goal(n):
+            dx = n.x - goal[0]
+            dy = n.y - goal[1]
+            dyaw = n.yaw - goal[2]
+            return math.sqrt(dx**2 + dy**2 + dyaw**2) < goal_tolerance
 
-        try:
-            path, _ = route_through_array(cost_map, start_px, goal_px, fully_connected=True)
-            path = np.array(path)
-            path[:, [0, 1]] = path[:, [1, 0]]  # Swap back to (x, y)
+        def heuristic(n):
+            dx = n.x - goal[0]
+            dy = n.y - goal[1]
+            return math.sqrt(dx**2 + dy**2)
 
-            # Clip path before obstacle
-            path_px = path.astype(int)
-            valid_path = []
-            for i, (x, y) in enumerate(path_px):
-                if 0 <= y < inflated.shape[0] and 0 <= x < inflated.shape[1]:
-                    if not inflated[y, x]:
-                        valid_path.append(path[i])
-                    else:
-                        break  # stop at first point inside an obstacle
-                else:
-                    break  # out of bounds
+        def is_valid(x, y):
+            px, py = world_to_map(x, y)
+            if 0 <= px < occ_map.shape[1] and 0 <= py < occ_map.shape[0]:
+                return occ_map[py, px] == 1  # free
+            return False
 
-            if len(valid_path) == 0:
-                self.get_logger().warn("A* path found, but all points are in obstacles.")
-                return {'path': None}
+        def expand_node(n):
+            next_nodes = []
+            for d in directions:
+                for sa in steering_angles:
+                    dx = d * math.cos(n.yaw)
+                    dy = d * math.sin(n.yaw)
+                    dyaw = d * math.tan(sa) / wheelbase
 
-            path = np.array(valid_path)
-            path_map = (path * self.resolution) + np.array(self.origin[:2], dtype=float)
-            return {'path': path_map}
+                    nx = n.x + dx
+                    ny = n.y + dy
+                    nyaw = n.yaw + dyaw
 
-        except Exception as e:
-            self.get_logger().warn(f"A* planning failed: {e}")
-            return {'path': None}
+                    if not is_valid(nx, ny):
+                        continue
+
+                    g_new = n.g_cost + math.hypot(dx, dy)
+                    h_new = heuristic(n)
+                    new_node = HybridNode(nx, ny, nyaw, g_new, h_new, parent=n)
+                    next_nodes.append(new_node)
+            return next_nodes
+
+        open_set = []
+        start_node = HybridNode(*start, g_cost=0.0, h_cost=heuristic(HybridNode(*start)))
+        heapq.heappush(open_set, start_node)
+        visited = set()
+
+        while open_set:
+            current = heapq.heappop(open_set)
+            if is_goal(current):
+                path = []
+                while current:
+                    path.append([current.x, current.y])
+                    current = current.parent
+                # print(path[::-1])
+                return {'path': np.array(path[::-1]).astype(float)}
+            
+            key = (int(current.x / resolution), int(current.y / resolution), int(current.yaw * 10))
+            if key in visited:
+                continue
+            visited.add(key)
+
+            for n in expand_node(current):
+                heapq.heappush(open_set, n)
+
+        return {'path': None}
+
 
 
     def clicked_callback(self, msg: PointStamped):
@@ -148,6 +195,8 @@ class SplatPlanner2DNode(Node):
             msg.point.y,
             -0.35
         ], device=self.device)
+
+        # self.goal_aligned = 
 
         self.get_logger().info(f"Received goal: {self.goal.cpu().numpy()}")
         self.planned = False  # allow replanning on new goal
@@ -158,7 +207,7 @@ class SplatPlanner2DNode(Node):
             return
         
         if self.goal is None:
-            self.get_logger().info("Waiting for goal from RViz...")
+            # self.get_logger().info("Waiting for goal from RViz...")
             return
 
         # Get current pose
@@ -167,6 +216,15 @@ class SplatPlanner2DNode(Node):
             msg.pose.pose.position.y,
             -0.35
         ], device=self.device)
+
+        # def quat_to_yaw(q):
+        #     return tf_transformations.euler_from_quaternion([q.x, q.y, q.z, q.w])[2]
+
+        pose = msg.pose.pose
+        orientation_q = pose.orientation
+        r = R.from_quat([orientation_q.x, orientation_q.y, orientation_q.z, orientation_q.w])
+        yaw = r.as_euler('xyz')[2]  # Extract yaw (rotation about Z)
+        start_aligned = torch.tensor([pose.position.x, pose.position.y, yaw], device=self.device)
 
         if self.planned and self.latest_start is not None:
             # If already planned, just republish latched topics
@@ -182,7 +240,14 @@ class SplatPlanner2DNode(Node):
         ######## 2D astar *** ########################## output - dict with key path
         print("Start: ", start)
         print("Goal: ", self.goal)
-        output = self.run_astar_scikit(start.cpu().numpy(), self.goal.cpu().numpy(), self.occ_map, 1.0)
+        # output = self.run_hybrid_astar(start.cpu().numpy(), self.goal.cpu().numpy(), self.occ_map, 1.0)
+        output = self.run_hybrid_astar(
+                                        start=start_aligned.cpu().numpy(),
+                                        goal=self.goal.cpu().numpy(),
+                                        occ_map=self.occ_map,
+                                        resolution=self.resolution,
+                                        origin=self.origin
+                                    )
 
         if output['path'] is None:
             self.get_logger().warn(f"Planning from: {start.cpu().numpy()} to {self.goal.cpu().numpy()} failed")
@@ -216,6 +281,8 @@ class SplatPlanner2DNode(Node):
         for pt in output['path']:
             pose = PoseStamped()
             pose.header.frame_id = 'map'
+            print(pt)
+            print(type(pt[0]))
             pose.pose.position.x = pt[0]
             pose.pose.position.y = pt[1]
             pose.pose.position.z = 0.0

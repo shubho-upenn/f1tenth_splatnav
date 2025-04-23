@@ -3,11 +3,15 @@
 /f1tenth_splatnav/ros2_ws/install/final_project/lib/python3.10/site-packages/2d_splatplan_ros.py
 /f1tenth_splatnav/ros2_ws/install/final_project/lib/python3.10/site-packages/semantic_splatplan_ros.py
 /f1tenth_splatnav/ros2_ws/install/final_project/lib/python3.10/site-packages/header.py
+/f1tenth_splatnav/ros2_ws/install/final_project/lib/python3.10/site-packages/2d_ackermann_plan.py
+/f1tenth_splatnav/ros2_ws/install/final_project/lib/python3.10/site-packages/semantic_2d_plan_ros.py
 /f1tenth_splatnav/ros2_ws/install/final_project/lib/python3.10/site-packages/__pycache__/publish_pcl.cpython-310.pyc
 /f1tenth_splatnav/ros2_ws/install/final_project/lib/python3.10/site-packages/__pycache__/splatplan_ros.cpython-310.pyc
 /f1tenth_splatnav/ros2_ws/install/final_project/lib/python3.10/site-packages/__pycache__/2d_splatplan_ros.cpython-310.pyc
 /f1tenth_splatnav/ros2_ws/install/final_project/lib/python3.10/site-packages/__pycache__/semantic_splatplan_ros.cpython-310.pyc
 /f1tenth_splatnav/ros2_ws/install/final_project/lib/python3.10/site-packages/__pycache__/header.cpython-310.pyc
+/f1tenth_splatnav/ros2_ws/install/final_project/lib/python3.10/site-packages/__pycache__/2d_ackermann_plan.cpython-310.pyc
+/f1tenth_splatnav/ros2_ws/install/final_project/lib/python3.10/site-packages/__pycache__/semantic_2d_plan_ros.cpython-310.pyc
 /f1tenth_splatnav/ros2_ws/install/final_project/share/ament_index/resource_index/packages/final_project
 /f1tenth_splatnav/ros2_ws/install/final_project/share/final_project/package.xml
 /f1tenth_splatnav/ros2_ws/install/final_project/lib/python3.10/site-packages/final_project-0.0.0-py3.10.egg-info/SOURCES.txt
@@ -17,7 +21,9 @@
 /f1tenth_splatnav/ros2_ws/install/final_project/lib/python3.10/site-packages/final_project-0.0.0-py3.10.egg-info/zip-safe
 /f1tenth_splatnav/ros2_ws/install/final_project/lib/python3.10/site-packages/final_project-0.0.0-py3.10.egg-info/PKG-INFO
 /f1tenth_splatnav/ros2_ws/install/final_project/lib/python3.10/site-packages/final_project-0.0.0-py3.10.egg-info/dependency_links.txt
+/f1tenth_splatnav/ros2_ws/install/final_project/lib/final_project/2d_ackermann_plan
 /f1tenth_splatnav/ros2_ws/install/final_project/lib/final_project/2d_splatplan_ros
 /f1tenth_splatnav/ros2_ws/install/final_project/lib/final_project/publish_pcl
+/f1tenth_splatnav/ros2_ws/install/final_project/lib/final_project/semantic_2d_plan_ros
 /f1tenth_splatnav/ros2_ws/install/final_project/lib/final_project/semantic_splatplan_ros
 /f1tenth_splatnav/ros2_ws/install/final_project/lib/final_project/splatplan_ros

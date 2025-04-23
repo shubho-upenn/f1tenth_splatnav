@@ -11,7 +11,9 @@ setup(
         'splatplan_ros',  # <-- Added your planner script
         '2d_splatplan_ros',
         'semantic_splatplan_ros',
-        'header'
+        'header',
+        '2d_ackermann_plan', 
+        'semantic_2d_plan_ros'
     ],
     package_dir={'': 'scripts'},
     data_files=[
@@ -31,7 +33,9 @@ setup(
             'publish_pcl = publish_pcl:main',
             'splatplan_ros = splatplan_ros:main',  # <-- Entry point for new node
             '2d_splatplan_ros = 2d_splatplan_ros:main',
-            'semantic_splatplan_ros = semantic_splatplan_ros:main'
+            'semantic_splatplan_ros = semantic_splatplan_ros:main',
+            '2d_ackermann_plan = 2d_ackermann_plan:main', 
+            'semantic_2d_plan_ros = semantic_2d_plan_ros:main'
         ],
     },
 )

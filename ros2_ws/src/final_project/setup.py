@@ -9,7 +9,9 @@ setup(
     py_modules=[
         'publish_pcl',
         'splatplan_ros',  # <-- Added your planner script
-        '2d_splatplan_ros'
+        '2d_splatplan_ros',
+        'semantic_splatplan_ros',
+        'header'
     ],
     package_dir={'': 'scripts'},
     data_files=[
@@ -28,7 +30,8 @@ setup(
         'console_scripts': [
             'publish_pcl = publish_pcl:main',
             'splatplan_ros = splatplan_ros:main',  # <-- Entry point for new node
-            '2d_splatplan_ros = 2d_splatplan_ros: main'
+            '2d_splatplan_ros = 2d_splatplan_ros:main',
+            'semantic_splatplan_ros = semantic_splatplan_ros:main'
         ],
     },
 )

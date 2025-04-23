@@ -10,7 +10,9 @@ setup.py
 ../../build/final_project/final_project.egg-info/zip-safe
 resource/final_project
 scripts/2d_splatplan_ros.py
+scripts/header.py
 scripts/publish_pcl.py
+scripts/semantic_splatplan_ros.py
 scripts/splatplan_ros.py
 test/test_copyright.py
 test/test_flake8.py

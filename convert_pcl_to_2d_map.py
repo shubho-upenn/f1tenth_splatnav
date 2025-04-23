@@ -66,16 +66,18 @@ def save_yaml(filename, image_file, resolution, origin):
         f.write("free_thresh: 0.2\n")
 
 if __name__ == "__main__":
-    ply_file = "/home/shubho/splatnav_f1tenth/outputs/vicon_small/mesh.ply"
+    ply_file = "/home/praks/f1tenth_splatnav/outputs/vicon_working/mesh.ply"
     bbox_min = np.array([-1.0, -1.0, -0.4])
     bbox_max = np.array([ 1.0,  1.0, -0.05])
     z_min = -0.27
     z_max = -0.23
     resolution = 0.05
 
-    pgm_filename = "/home/shubho/ese6150/sim_ws/src/f1tenth_gym_ros/maps/vicon_small.pgm"
-    yaml_filename = "/home/shubho/ese6150/sim_ws/src/f1tenth_gym_ros/maps/vicon_small.yaml"
-
+    # pgm_filename = "/home/shubho/ese6150/sim_ws/src/f1tenth_gym_ros/maps/vicon_small.pgm"
+    # yaml_filename = "/home/shubho/ese6150/sim_ws/src/f1tenth_gym_ros/maps/vicon_small.yaml"
+    
+    pgm_filename = "/home/praks/f1tenth_splatnav/outputs/vicon_working/vicon_working.pgm"
+    yaml_filename = "/home/praks/f1tenth_splatnav/outputs/vicon_working/vicon_working.yaml"
     # Generate occupancy grid and origin
     grid, origin = create_occupancy_grid_from_ply(
         ply_file, z_min, z_max, resolution,

@@ -1,10 +1,12 @@
 import sys
 import os
+# from header import NeRF
 
 # Add the absolute path to f1tenth_splatnav to import splat modules
 splatnav_path = os.path.abspath("/f1tenth_splatnav")
 sys.path.insert(0, splatnav_path)
 
+import gc
 import rclpy
 from rclpy.node import Node
 from nav_msgs.msg import Odometry
@@ -26,11 +28,25 @@ class SplatPlannerNode(Node):
         super().__init__('splat_planner_node')
 
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.goal = None
         self.scale = 1.0 / 0.1778384719584236
 
+        # self.nerf = NeRF(config_path=Path(f"/f1tenth_splatnav/outputs/vicon_working/gemsplat/2025-04-19_192539/config.yml"),
+        #     res_factor=None,
+        #     test_mode="test",
+        #     dataset_mode="val",
+        #     device=self.device)
+        
+        # self.nerf.generate_point_cloud(use_bounding_box=True)
+
+        # del self.nerf, self.env_pcd, self.env_attr
+
+        # gc.collect()
+        # torch.cuda.empty_cache()
+
+        # print("Goal set")
+
         # Config path
-        gsplat_config_path = Path("/f1tenth_splatnav/outputs/vicon_small/splatfacto/2025-04-22_005347/config.yml")
+        gsplat_config_path = Path("/f1tenth_splatnav/outputs/vicon_working/gemsplat/2025-04-19_192539/config.yml")
 
         # Load GSplat and Planner
         self.gsplat = GSplatLoader(gsplat_config_path, self.device)
@@ -53,21 +69,57 @@ class SplatPlannerNode(Node):
         self.goal_marker_pub = self.create_publisher(Marker, '/goal_marker', qos_transient)
 
         self.odom_sub = self.create_subscription(Odometry, '/ego_racecar/odom', self.odom_callback, 10)
-        self.clicked_sub = self.create_subscription(PointStamped, '/clicked_point', self.clicked_callback, 10)
+        # self.clicked_sub = self.create_subscription(PointStamped, '/clicked_point', self.clicked_callback, 10)
 
         self.path_msg = None
         self.latest_start = None
         self.planned = False
 
-    def clicked_callback(self, msg: PointStamped):
-        self.goal = torch.tensor([
-            msg.point.x / self.scale,
-            msg.point.y / self.scale,
-            -0.35
-        ], device=self.device)
+        self.env_pcd, _, self.env_attr = self.gsplat.splat.generate_point_cloud(use_bounding_box=True)
+        self.goal = self.select_goal()
 
-        self.get_logger().info(f"Received goal: {self.goal.cpu().numpy()}")
-        self.planned = False  # allow replanning on new goal
+
+
+
+    ## Function that returns a (3, ) torch tensor
+    def select_goal(self):
+        positives = input("Enter the object to detect (e.g., ball): ").strip()
+        negatives = input("Enter negatives (if none, just press enter): ").strip()
+
+        semantic_info = self.gsplat.splat.get_semantic_point_cloud(
+            positives=positives,
+            # negatives=negatives,
+            pcd_attr=self.env_attr
+        )
+
+        sc_sim = torch.clip(semantic_info["similarity"] - 0.5, 0, 1)
+        sc_sim = sc_sim / (sc_sim.max() + 1e-6)  # Normalize
+
+        # Find index of maximum similarity
+        max_idx = torch.argmax(sc_sim).item()
+
+        # Get the corresponding x, y, z coordinate from the point cloud
+        hottest_point = np.asarray(self.env_pcd.points)[max_idx]
+
+        print(f"Hottest point for '{positives}' is at index {max_idx}")
+        print(f"Coordinates (x, y, z): {hottest_point}: {hottest_point * self.scale}")
+        goal = torch.tensor(hottest_point, dtype=torch.float32, device=self.device)
+
+        self.publish_goal_marker(goal_pos=(goal[0].item() * self.scale, goal[1].item() * self.scale))
+
+        return goal  # Return as (3,) torch tensor
+
+
+
+    # def clicked_callback(self, msg: PointStamped):
+    #     self.goal = torch.tensor([
+    #         msg.point.x / self.scale,
+    #         msg.point.y / self.scale,
+    #         -0.35
+    #     ], device=self.device)
+
+    #     self.get_logger().info(f"Received goal: {self.goal.cpu().numpy()}")
+    #     self.planned = False  # allow replanning on new goal
 
     def odom_callback(self, msg: Odometry):
         if self.goal is None:
@@ -129,7 +181,7 @@ class SplatPlannerNode(Node):
             self.path_msg.poses.append(pose)
 
         self.path_pub.publish(self.path_msg)
-        self.publish_goal_marker(goal_pos=(self.goal[0].item() * self.scale, self.goal[1].item() * self.scale))
+        
         self.get_logger().info("Published new path and goal marker.")
 
         self.latest_start = start

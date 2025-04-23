@@ -3,6 +3,9 @@ outputs
 blender_envs
 configs
 trajs
+ros2_ws/build
+ros2_ws/install
+ros2_ws/log
 *.obj
 *.ply
 *.png

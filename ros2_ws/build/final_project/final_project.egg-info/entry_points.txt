@@ -1,4 +1,5 @@
 [console_scripts]
-2d_splatplan_ros = 2d_splatplan_ros: main
+2d_splatplan_ros = 2d_splatplan_ros:main
 publish_pcl = publish_pcl:main
+semantic_splatplan_ros = semantic_splatplan_ros:main
 splatplan_ros = splatplan_ros:main

@@ -112,19 +112,31 @@ class SplatPlan():
   
         # # Save outgoing information
         traj = path     ## For our scenario
-        traj_data = {
-            'path': path.tolist(),
-            # 'polytopes': [torch.cat([polytope[0], polytope[1].unsqueeze(-1)], dim=-1).tolist() for polytope in polytopes],
-            # 'num_polytopes': len(polytopes),
-            'traj': traj.tolist(),
-            'times_astar': time_astar,
-            # 'times_collision_set': times_collision_set,
-            # 'times_polytope': times_polytope,
-            # 'times_opt': times_opt,
-            # 'feasible': feasible
-        }
+        if traj is not None:
+            traj_data = {
+                'path': path.tolist(),
+                # 'polytopes': [torch.cat([polytope[0], polytope[1].unsqueeze(-1)], dim=-1).tolist() for polytope in polytopes],
+                # 'num_polytopes': len(polytopes),
+                'traj': traj.tolist(),
+                'times_astar': time_astar,
+                # 'times_collision_set': times_collision_set,
+                # 'times_polytope': times_polytope,
+                # 'times_opt': times_opt,
+                # 'feasible': feasible
+            }
 
-        # self.save_polytope(polytopes, 'feasible.obj')
+        else:
+            traj_data = {
+                'path': None,
+                # 'polytopes': [torch.cat([polytope[0], polytope[1].unsqueeze(-1)], dim=-1).tolist() for polytope in polytopes],
+                # 'num_polytopes': len(polytopes),
+                'traj': None,
+                'times_astar': time_astar,
+                # 'times_collision_set': times_collision_set,
+                # 'times_polytope': times_polytope,
+                # 'times_opt': times_opt,
+                # 'feasible': feasible
+            }
         
         return traj_data
     '''

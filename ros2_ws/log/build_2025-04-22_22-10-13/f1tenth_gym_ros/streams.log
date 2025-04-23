@@ -1,0 +1,33 @@
+[0.586s] Invoking command in '/f1tenth_splatnav/ros2_ws/src/f1tenth_gym_ros': PYTHONPATH=/f1tenth_splatnav/ros2_ws/build/f1tenth_gym_ros/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/f1tenth_splatnav/ros2_ws/install/f1tenth_gym_ros/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/f1tenth_gym_ros build --build-base /f1tenth_splatnav/ros2_ws/build/f1tenth_gym_ros/build install --record /f1tenth_splatnav/ros2_ws/build/f1tenth_gym_ros/install.log --single-version-externally-managed install_data
+[0.738s] running egg_info
+[0.747s] writing ../../build/f1tenth_gym_ros/f1tenth_gym_ros.egg-info/PKG-INFO
+[0.748s] writing dependency_links to ../../build/f1tenth_gym_ros/f1tenth_gym_ros.egg-info/dependency_links.txt
+[0.748s] writing entry points to ../../build/f1tenth_gym_ros/f1tenth_gym_ros.egg-info/entry_points.txt
+[0.748s] writing requirements to ../../build/f1tenth_gym_ros/f1tenth_gym_ros.egg-info/requires.txt
+[0.748s] writing top-level names to ../../build/f1tenth_gym_ros/f1tenth_gym_ros.egg-info/top_level.txt
+[0.767s] reading manifest file '../../build/f1tenth_gym_ros/f1tenth_gym_ros.egg-info/SOURCES.txt'
+[0.767s] adding license file 'LICENSE'
+[0.767s] writing manifest file '../../build/f1tenth_gym_ros/f1tenth_gym_ros.egg-info/SOURCES.txt'
+[0.767s] running build
+[0.767s] running build_py
+[0.767s] copying f1tenth_gym_ros/gym_bridge.py -> /f1tenth_splatnav/ros2_ws/build/f1tenth_gym_ros/build/lib/f1tenth_gym_ros
+[0.768s] copying f1tenth_gym_ros/__init__.py -> /f1tenth_splatnav/ros2_ws/build/f1tenth_gym_ros/build/lib/f1tenth_gym_ros
+[0.768s] running install
+[0.771s] running install_lib
+[0.781s] running install_data
+[0.781s] copying resource/f1tenth_gym_ros -> /f1tenth_splatnav/ros2_ws/install/f1tenth_gym_ros/share/ament_index/resource_index/packages
+[0.781s] copying package.xml -> /f1tenth_splatnav/ros2_ws/install/f1tenth_gym_ros/share/f1tenth_gym_ros
+[0.781s] copying launch/gym_bridge_launch.py -> /f1tenth_splatnav/ros2_ws/install/f1tenth_gym_ros/share/f1tenth_gym_ros/launch
+[0.781s] copying launch/opp_racecar.xacro -> /f1tenth_splatnav/ros2_ws/install/f1tenth_gym_ros/share/f1tenth_gym_ros/launch
+[0.781s] copying launch/ego_racecar_fullscale.xacro -> /f1tenth_splatnav/ros2_ws/install/f1tenth_gym_ros/share/f1tenth_gym_ros/launch
+[0.781s] copying launch/ego_racecar.xacro -> /f1tenth_splatnav/ros2_ws/install/f1tenth_gym_ros/share/f1tenth_gym_ros/launch
+[0.781s] copying launch/ego_racecar_f1fifth.xacro -> /f1tenth_splatnav/ros2_ws/install/f1tenth_gym_ros/share/f1tenth_gym_ros/launch
+[0.782s] copying launch/gym_bridge.rviz -> /f1tenth_splatnav/ros2_ws/install/f1tenth_gym_ros/share/f1tenth_gym_ros/launch
+[0.782s] copying config/sim.yaml -> /f1tenth_splatnav/ros2_ws/install/f1tenth_gym_ros/share/f1tenth_gym_ros/config
+[0.782s] running install_egg_info
+[0.792s] removing '/f1tenth_splatnav/ros2_ws/install/f1tenth_gym_ros/lib/python3.10/site-packages/f1tenth_gym_ros-0.0.0-py3.10.egg-info' (and everything under it)
+[0.792s] Copying ../../build/f1tenth_gym_ros/f1tenth_gym_ros.egg-info to /f1tenth_splatnav/ros2_ws/install/f1tenth_gym_ros/lib/python3.10/site-packages/f1tenth_gym_ros-0.0.0-py3.10.egg-info
+[0.793s] running install_scripts
+[0.874s] Installing gym_bridge script to /f1tenth_splatnav/ros2_ws/install/f1tenth_gym_ros/lib/f1tenth_gym_ros
+[0.874s] writing list of installed files to '/f1tenth_splatnav/ros2_ws/build/f1tenth_gym_ros/install.log'
+[0.889s] Invoked command in '/f1tenth_splatnav/ros2_ws/src/f1tenth_gym_ros' returned '0': PYTHONPATH=/f1tenth_splatnav/ros2_ws/build/f1tenth_gym_ros/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/f1tenth_splatnav/ros2_ws/install/f1tenth_gym_ros/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/f1tenth_gym_ros build --build-base /f1tenth_splatnav/ros2_ws/build/f1tenth_gym_ros/build install --record /f1tenth_splatnav/ros2_ws/build/f1tenth_gym_ros/install.log --single-version-externally-managed install_data

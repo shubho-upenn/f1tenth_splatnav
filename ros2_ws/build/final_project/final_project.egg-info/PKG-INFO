@@ -1,0 +1,8 @@
+Metadata-Version: 2.1
+Name: final_project
+Version: 0.0.0
+Summary: Publishes pointcloud from ply file to ROS2 topic and path from GSplat planner
+Maintainer: shubho
+Maintainer-email: ssaditya@seas.upenn.edu
+License: MIT
+Requires-Dist: setuptools

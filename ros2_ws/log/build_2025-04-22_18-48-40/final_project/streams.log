@@ -1,0 +1,28 @@
+[0.531s] Invoking command in '/f1tenth_splatnav/ros2_ws/src/final_project': PYTHONPATH=/f1tenth_splatnav/ros2_ws/build/final_project/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/f1tenth_splatnav/ros2_ws/install/final_project/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/final_project build --build-base /f1tenth_splatnav/ros2_ws/build/final_project/build install --record /f1tenth_splatnav/ros2_ws/build/final_project/install.log --single-version-externally-managed install_data
+[0.666s] running egg_info
+[0.674s] writing ../../build/final_project/final_project.egg-info/PKG-INFO
+[0.674s] writing dependency_links to ../../build/final_project/final_project.egg-info/dependency_links.txt
+[0.674s] writing entry points to ../../build/final_project/final_project.egg-info/entry_points.txt
+[0.674s] writing requirements to ../../build/final_project/final_project.egg-info/requires.txt
+[0.674s] writing top-level names to ../../build/final_project/final_project.egg-info/top_level.txt
+[0.690s] reading manifest file '../../build/final_project/final_project.egg-info/SOURCES.txt'
+[0.690s] writing manifest file '../../build/final_project/final_project.egg-info/SOURCES.txt'
+[0.690s] running build
+[0.690s] running build_py
+[0.690s] copying scripts/publish_pcl.py -> /f1tenth_splatnav/ros2_ws/build/final_project/build/lib
+[0.691s] copying scripts/splatplan_ros.py -> /f1tenth_splatnav/ros2_ws/build/final_project/build/lib
+[0.691s] running install
+[0.693s] running install_lib
+[0.702s] copying /f1tenth_splatnav/ros2_ws/build/final_project/build/lib/splatplan_ros.py -> /f1tenth_splatnav/ros2_ws/install/final_project/lib/python3.10/site-packages
+[0.702s] byte-compiling /f1tenth_splatnav/ros2_ws/install/final_project/lib/python3.10/site-packages/splatplan_ros.py to splatplan_ros.cpython-310.pyc
+[0.703s] running install_data
+[0.703s] copying resource/final_project -> /f1tenth_splatnav/ros2_ws/install/final_project/share/ament_index/resource_index/packages
+[0.703s] copying package.xml -> /f1tenth_splatnav/ros2_ws/install/final_project/share/final_project
+[0.703s] running install_egg_info
+[0.711s] removing '/f1tenth_splatnav/ros2_ws/install/final_project/lib/python3.10/site-packages/final_project-0.0.0-py3.10.egg-info' (and everything under it)
+[0.711s] Copying ../../build/final_project/final_project.egg-info to /f1tenth_splatnav/ros2_ws/install/final_project/lib/python3.10/site-packages/final_project-0.0.0-py3.10.egg-info
+[0.712s] running install_scripts
+[0.782s] Installing publish_pcl script to /f1tenth_splatnav/ros2_ws/install/final_project/lib/final_project
+[0.782s] Installing splatplan_ros script to /f1tenth_splatnav/ros2_ws/install/final_project/lib/final_project
+[0.782s] writing list of installed files to '/f1tenth_splatnav/ros2_ws/build/final_project/install.log'
+[0.799s] Invoked command in '/f1tenth_splatnav/ros2_ws/src/final_project' returned '0': PYTHONPATH=/f1tenth_splatnav/ros2_ws/build/final_project/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/f1tenth_splatnav/ros2_ws/install/final_project/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/final_project build --build-base /f1tenth_splatnav/ros2_ws/build/final_project/build install --record /f1tenth_splatnav/ros2_ws/build/final_project/install.log --single-version-externally-managed install_data

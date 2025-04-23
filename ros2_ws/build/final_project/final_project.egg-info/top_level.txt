@@ -1,3 +1,5 @@
 2d_splatplan_ros
+header
 publish_pcl
+semantic_splatplan_ros
 splatplan_ros

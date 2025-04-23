@@ -13,6 +13,7 @@ from geometry_msgs.msg import PoseStamped, PointStamped
 from visualization_msgs.msg import Marker
 from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSDurabilityPolicy
 from skimage.graph import route_through_array
+from scipy.ndimage import binary_dilation
 from nav_msgs.msg import OccupancyGrid
 
 import torch
@@ -29,7 +30,12 @@ class SplatPlanner2DNode(Node):
 
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.goal = None
-        self.scale = 1.0 / 0.1778384719584236
+
+        self.resolution = None
+        self.origin = None
+        
+        
+        # self.scale = 1.0 / 0.1778384719584236
 
         # Config path
         # gsplat_config_path = Path("/f1tenth_splatnav/outputs/vicon_small/splatfacto/2025-04-22_005347/config.yml")
@@ -47,7 +53,6 @@ class SplatPlanner2DNode(Node):
         ## Instead of loading splat - load the 2D map generated from the splat:
         
         self.occ_map = None
-        self.create_subscription(OccupancyGrid, "/map", self.map_callback, 10)
 
         # ROS interfaces
         qos_transient = QoSProfile(
@@ -58,6 +63,7 @@ class SplatPlanner2DNode(Node):
 
         self.path_pub = self.create_publisher(Path_ros, '/splatnav_path', qos_transient)
         self.goal_marker_pub = self.create_publisher(Marker, '/goal_marker', qos_transient)
+        self.create_subscription(OccupancyGrid, "/map", self.map_callback, qos_transient)
 
         self.odom_sub = self.create_subscription(Odometry, '/ego_racecar/odom', self.odom_callback, 10)
         self.clicked_sub = self.create_subscription(PointStamped, '/clicked_point', self.clicked_callback, 10)
@@ -70,20 +76,67 @@ class SplatPlanner2DNode(Node):
         data = np.array(msg.data, dtype=np.int8).reshape(msg.info.height, msg.info.width)
         self.occ_map = (data == 0).astype(np.uint8)  # free = 0, occupied = 100, unknown = -1
         self.resolution = msg.info.resolution
+        self.origin = (msg.info.origin.position.x, msg.info.origin.position.y) 
         self.get_logger().info("Received and processed map from /map topic.")
 
-    
-    def run_astar_scikit(self, start, goal, occ_map, resolution):
-        start_px = (int(start[1]), int(start[0]))  # (row, col)
-        goal_px = (int(goal[1]), int(goal[0]))
+    def run_astar_scikit(self, start, goal, occ_map, resolution, buffer=0.3):
+        def map_to_pixel(coords):
+            x = coords[1]
+            y = coords[0]
+            x_or = self.origin[1]
+            y_or = self.origin[0]
+            x_pix = int((x - x_or) / self.resolution)
+            y_pix = int((y - y_or) / self.resolution)
+            return (x_pix, y_pix)
 
-        # Invert map: 0 = free, high = obstacle
-        cost_map = np.where(occ_map > 0, 1.0, 1e6).astype(np.float32)
+        def pixel_to_map(pixel):
+            x_pix = pixel[0]
+            y_pix = pixel[1]
+            x_or = self.origin[0]
+            y_or = self.origin[1]
+            x = float((x_pix * self.resolution) + x_or)
+            y = float((y_pix * self.resolution) + y_or)
+            return (x, y)
+
+        start_px = map_to_pixel(start)
+        goal_px = map_to_pixel(goal)
+        print("Start:", start, "->", start_px)
+        print("Goal:", goal, "->", goal_px)
+
+        # Inflate obstacles
+        expansion_radius = int(buffer / self.resolution)
+        binary_obstacles = occ_map == 0  # 0 = occupied in your logic
+        structure = np.ones((2 * expansion_radius + 1, 2 * expansion_radius + 1), dtype=bool)
+        inflated = binary_dilation(binary_obstacles, structure=structure)
+
+        # Cost map
+        cost_map = np.where(inflated, 1e6, 1.0).astype(np.float32)
 
         try:
             path, _ = route_through_array(cost_map, start_px, goal_px, fully_connected=True)
-            path_xy = [(col, row) for row, col in path]
-            return {'path': path_xy}
+            path = np.array(path)
+            path[:, [0, 1]] = path[:, [1, 0]]  # Swap back to (x, y)
+
+            # Clip path before obstacle
+            path_px = path.astype(int)
+            valid_path = []
+            for i, (x, y) in enumerate(path_px):
+                if 0 <= y < inflated.shape[0] and 0 <= x < inflated.shape[1]:
+                    if not inflated[y, x]:
+                        valid_path.append(path[i])
+                    else:
+                        break  # stop at first point inside an obstacle
+                else:
+                    break  # out of bounds
+
+            if len(valid_path) == 0:
+                self.get_logger().warn("A* path found, but all points are in obstacles.")
+                return {'path': None}
+
+            path = np.array(valid_path)
+            path_map = (path * self.resolution) + np.array(self.origin[:2], dtype=float)
+            return {'path': path_map}
+
         except Exception as e:
             self.get_logger().warn(f"A* planning failed: {e}")
             return {'path': None}
@@ -133,6 +186,7 @@ class SplatPlanner2DNode(Node):
 
         if output['path'] is None:
             self.get_logger().warn(f"Planning from: {start.cpu().numpy()} to {self.goal.cpu().numpy()} failed")
+            input("Press enter and select new waypoint on rviz to continue")
             self.goal = None
             return 
 

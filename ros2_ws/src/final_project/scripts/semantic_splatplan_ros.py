@@ -28,7 +28,7 @@ class SplatPlannerNode(Node):
         super().__init__('splat_planner_node')
 
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.scale = 1.0 / 0.1778384719584236
+        self.scale = (1.0 / 0.1778384719584236) / 1.78
 
         # self.nerf = NeRF(config_path=Path(f"/f1tenth_splatnav/outputs/vicon_working/gemsplat/2025-04-19_192539/config.yml"),
         #     res_factor=None,
@@ -67,8 +67,9 @@ class SplatPlannerNode(Node):
 
         self.path_pub = self.create_publisher(Path_ros, '/splatnav_path', qos_transient)
         self.goal_marker_pub = self.create_publisher(Marker, '/goal_marker', qos_transient)
-
-        self.odom_sub = self.create_subscription(Odometry, '/ego_racecar/odom', self.odom_callback, 10)
+        # odom = '/ego_racecar/odom'
+        odom = '/pf/pose/odom'
+        self.odom_sub = self.create_subscription(Odometry, odom, self.odom_callback, 10)
         # self.clicked_sub = self.create_subscription(PointStamped, '/clicked_point', self.clicked_callback, 10)
 
         self.path_msg = None

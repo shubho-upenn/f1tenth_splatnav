@@ -38,7 +38,7 @@ class PointCloudPublisher(Node):
             [0.006485733203589916, -0.21569545567035675, 0.9764391183853149, -0.04808540642261505],
             [0.05937574803829193, -0.9746537804603577, -0.21569545567035675, 0.038161471486091614]
         ])
-        scale = 1.0/0.1778384719584236
+        scale = (1.0/0.1778384719584236)/1.78
         R = transform[:, :3]
         t = transform[:, 3]
 
@@ -112,7 +112,7 @@ class PointCloudPublisher(Node):
 
 def main():
     rclpy.init()
-    node = PointCloudPublisher('/f1tenth_splatnav/outputs/vicon_small/mesh.ply')
+    node = PointCloudPublisher('/home/praks/f1tenth_splatnav/outputs/vicon_working/mesh.ply')
     rclpy.spin(node)
 
 if __name__ == '__main__':

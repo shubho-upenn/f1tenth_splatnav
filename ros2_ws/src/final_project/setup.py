@@ -8,10 +8,14 @@ setup(
     packages=[],
     py_modules=[
         'publish_pcl',
-        'splatplan_ros',  # <-- Added your planner script
+        'splatplan_ros', 
         '2d_splatplan_ros',
         'semantic_splatplan_ros',
-        'header'
+        'header',
+        'semantic_2d_plan_ros',
+        'semantic_2d_ackermann_plan', 
+        '2d_ackermann_plan'
+
     ],
     package_dir={'': 'scripts'},
     data_files=[
@@ -31,7 +35,10 @@ setup(
             'publish_pcl = publish_pcl:main',
             'splatplan_ros = splatplan_ros:main',  # <-- Entry point for new node
             '2d_splatplan_ros = 2d_splatplan_ros:main',
-            'semantic_splatplan_ros = semantic_splatplan_ros:main'
+            'semantic_splatplan_ros = semantic_splatplan_ros:main',
+            'semantic_2d_plan_ros= semantic_2d_plan_ros:main',
+            'semantic_2d_ackermann_plan = semantic_2d_ackermann_plan:main',
+            '2d_ackermann_plan = 2d_ackermann_plan:main'
         ],
     },
 )

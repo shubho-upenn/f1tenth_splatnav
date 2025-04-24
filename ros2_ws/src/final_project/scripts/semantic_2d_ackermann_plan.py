@@ -1,6 +1,3 @@
-
-
-
 import sys
 import os
 
@@ -25,7 +22,7 @@ import numpy as np
 # import tf_transformations
 from scipy.spatial.transform import Rotation as R
 
-# from splat.splat_utils import GSplatLoader
+from splat.splat_utils import GSplatLoader
 # from splatplan.splatplan1 import SplatPlan
 
 
@@ -59,13 +56,13 @@ class SplatPlanner2DNode(Node):
         self.origin = None
         
         
-        # self.scale = 1.0 / 0.1778384719584236
+        self.scale = (1.0 / 0.1778384719584236) / 1.78
 
         # Config path
-        # gsplat_config_path = Path("/f1tenth_splatnav/outputs/vicon_small/splatfacto/2025-04-22_005347/config.yml")
+        gsplat_config_path = Path("/f1tenth_splatnav/outputs/vicon_working/gemsplat/2025-04-19_192539/config.yml")
 
         # Load GSplat and Planner
-        # self.gsplat = GSplatLoader(gsplat_config_path, self.device)
+        self.gsplat = GSplatLoader(gsplat_config_path, self.device)
         # self.voxel_config = {
         #     'lower_bound': torch.tensor([-1, -1, -0.35], device=self.device),
         #     'upper_bound': torch.tensor([1, 1, -0.05], device=self.device),
@@ -90,12 +87,16 @@ class SplatPlanner2DNode(Node):
         self.create_subscription(OccupancyGrid, "/map", self.map_callback, qos_transient)
         # odom = '/ego_racecar/odom'
         odom = '/pf/pose/odom'
+
         self.odom_sub = self.create_subscription(Odometry, odom, self.odom_callback, 10)
-        self.clicked_sub = self.create_subscription(PointStamped, '/clicked_point', self.clicked_callback, 10)
+        # self.clicked_sub = self.create_subscription(PointStamped, '/clicked_point', self.clicked_callback, 10)
 
         self.path_msg = None
         self.latest_start = None
         self.planned = False
+
+        self.env_pcd, _, self.env_attr = self.gsplat.splat.generate_point_cloud(use_bounding_box=True)
+        self.goal = self.select_goal()
 
     def map_callback(self, msg):
         data = np.array(msg.data, dtype=np.int8).reshape(msg.info.height, msg.info.width)
@@ -118,9 +119,9 @@ class SplatPlanner2DNode(Node):
 
 
     def run_hybrid_astar(self, start, goal, occ_map, resolution, origin, wheelbase=0.3):
-        steering_angles = np.linspace(-0.52, 0.52, 30)
+        steering_angles = np.linspace(-0.52, 0.52, 25)
         directions = [0.0707]  # forward only
-        goal_tolerance = 0.2
+        goal_tolerance = 0.1
 
         def map_to_world(px, py):
             return (px * resolution + origin[0], py * resolution + origin[1])
@@ -132,7 +133,9 @@ class SplatPlanner2DNode(Node):
             dx = n.x - goal[0]
             dy = n.y - goal[1]
             dyaw = n.yaw - goal[2]
-            return math.sqrt(dx**2 + dy**2 + dyaw**2) < goal_tolerance
+            # return math.sqrt(dx**2 + dy**2 + dyaw**2) < goal_tolerance
+            return math.sqrt(dx**2 + dy**2) < goal_tolerance
+
 
         def heuristic(n):
             dx = n.x - goal[0]
@@ -173,7 +176,6 @@ class SplatPlanner2DNode(Node):
 
         while open_set:
             current = heapq.heappop(open_set)
-            print("1")
             if is_goal(current):
                 path = []
                 while current:
@@ -191,6 +193,34 @@ class SplatPlanner2DNode(Node):
                 heapq.heappush(open_set, n)
 
         return {'path': None}
+
+
+    def select_goal(self):
+        positives = input("Enter the object to detect (e.g., ball): ").strip()
+        negatives = input("Enter negatives (if none, just press enter): ").strip()
+
+        semantic_info = self.gsplat.splat.get_semantic_point_cloud(
+            positives=positives,
+            # negatives=negatives,
+            pcd_attr=self.env_attr
+        )
+
+        sc_sim = torch.clip(semantic_info["similarity"] - 0.5, 0, 1)
+        sc_sim = sc_sim / (sc_sim.max() + 1e-6)  # Normalize
+
+        # Find index of maximum similarity
+        max_idx = torch.argmax(sc_sim).item()
+
+        # Get the corresponding x, y, z coordinate from the point cloud
+        hottest_point = np.asarray(self.env_pcd.points)[max_idx]
+
+        print(f"Hottest point for '{positives}' is at index {max_idx}")
+        print(f"Coordinates (x, y, z): {hottest_point}: {hottest_point * self.scale}")
+        goal = torch.tensor(hottest_point, dtype=torch.float32, device=self.device)
+
+        self.publish_goal_marker(goal_pos=(goal[0].item() * self.scale, goal[1].item() * self.scale))
+
+        return goal  # Return as (3,) torch tensor
 
 
 

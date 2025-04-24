@@ -35,10 +35,17 @@ class SplatPlanner2DNode(Node):
         self.origin = None
         
         
+<<<<<<< HEAD
         self.scale = (1.0 / 0.1778384719584236) / 1.78
 
         # Config path
         gsplat_config_path = Path("/f1tenth_splatnav/outputs/vicon_working/gemsplat/2025-04-19_192539/config.yml")
+=======
+        self.scale = 1.0 / 0.1778384719584236
+
+        # Config path
+        gsplat_config_path = Path("/f1tenth_splatnav/outputs/vicon_small/splatfacto/2025-04-22_005347/config.yml")
+>>>>>>> b76df322b7664ee8537085bffc7e3c6e13d95736
 
         # Load GSplat and Planner
         self.gsplat = GSplatLoader(gsplat_config_path, self.device)
@@ -64,11 +71,16 @@ class SplatPlanner2DNode(Node):
         self.path_pub = self.create_publisher(Path_ros, '/splatnav_path', qos_transient)
         self.goal_marker_pub = self.create_publisher(Marker, '/goal_marker', qos_transient)
         self.create_subscription(OccupancyGrid, "/map", self.map_callback, qos_transient)
+<<<<<<< HEAD
         
         # odom = '/ego_racecar/odom'
         odom = 'pf/pose/odom'
 
         self.odom_sub = self.create_subscription(Odometry, odom, self.odom_callback, 10)
+=======
+
+        self.odom_sub = self.create_subscription(Odometry, '/ego_racecar/odom', self.odom_callback, 10)
+>>>>>>> b76df322b7664ee8537085bffc7e3c6e13d95736
         # self.clicked_sub = self.create_subscription(PointStamped, '/clicked_point', self.clicked_callback, 10)
 
         self.path_msg = None
@@ -101,7 +113,11 @@ class SplatPlanner2DNode(Node):
 
         print(f"Hottest point for '{positives}' is at index {max_idx}")
         print(f"Coordinates (x, y, z): {hottest_point}: {hottest_point * self.scale}")
+<<<<<<< HEAD
         goal = torch.tensor(hottest_point * self.scale, dtype=torch.float32, device=self.device)
+=======
+        goal = torch.tensor(hottest_point, dtype=torch.float32, device=self.device)
+>>>>>>> b76df322b7664ee8537085bffc7e3c6e13d95736
 
         self.publish_goal_marker(goal_pos=(goal[0].item() * self.scale, goal[1].item() * self.scale))
 
@@ -116,7 +132,11 @@ class SplatPlanner2DNode(Node):
         self.get_logger().info("Received and processed map from /map topic.")
 
 
+<<<<<<< HEAD
     def run_astar_scikit(self, start, goal, occ_map, resolution, buffer=0.15):
+=======
+    def run_astar_scikit(self, start, goal, occ_map, resolution, buffer=0.3):
+>>>>>>> b76df322b7664ee8537085bffc7e3c6e13d95736
         def map_to_pixel(coords):
             x = coords[1]
             y = coords[0]

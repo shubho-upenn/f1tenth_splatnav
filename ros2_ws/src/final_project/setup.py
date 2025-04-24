@@ -12,10 +12,15 @@ setup(
         '2d_splatplan_ros',
         'semantic_splatplan_ros',
         'header',
+<<<<<<< HEAD
         'semantic_2d_plan_ros',
         'semantic_2d_ackermann_plan', 
         '2d_ackermann_plan'
 
+=======
+        '2d_ackermann_plan', 
+        'semantic_2d_plan_ros'
+>>>>>>> b76df322b7664ee8537085bffc7e3c6e13d95736
     ],
     package_dir={'': 'scripts'},
     data_files=[
@@ -36,9 +41,14 @@ setup(
             'splatplan_ros = splatplan_ros:main',  # <-- Entry point for new node
             '2d_splatplan_ros = 2d_splatplan_ros:main',
             'semantic_splatplan_ros = semantic_splatplan_ros:main',
+<<<<<<< HEAD
             'semantic_2d_plan_ros= semantic_2d_plan_ros:main',
             'semantic_2d_ackermann_plan = semantic_2d_ackermann_plan:main',
             '2d_ackermann_plan = 2d_ackermann_plan:main'
+=======
+            '2d_ackermann_plan = 2d_ackermann_plan:main', 
+            'semantic_2d_plan_ros = semantic_2d_plan_ros:main'
+>>>>>>> b76df322b7664ee8537085bffc7e3c6e13d95736
         ],
     },
 )

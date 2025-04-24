@@ -1,6 +1,9 @@
+<<<<<<< HEAD
 
 
 
+=======
+>>>>>>> b76df322b7664ee8537085bffc7e3c6e13d95736
 import sys
 import os
 
@@ -88,9 +91,14 @@ class SplatPlanner2DNode(Node):
         self.path_pub = self.create_publisher(Path_ros, '/splatnav_path', qos_transient)
         self.goal_marker_pub = self.create_publisher(Marker, '/goal_marker', qos_transient)
         self.create_subscription(OccupancyGrid, "/map", self.map_callback, qos_transient)
+<<<<<<< HEAD
         # odom = '/ego_racecar/odom'
         odom = '/pf/pose/odom'
         self.odom_sub = self.create_subscription(Odometry, odom, self.odom_callback, 10)
+=======
+
+        self.odom_sub = self.create_subscription(Odometry, '/ego_racecar/odom', self.odom_callback, 10)
+>>>>>>> b76df322b7664ee8537085bffc7e3c6e13d95736
         self.clicked_sub = self.create_subscription(PointStamped, '/clicked_point', self.clicked_callback, 10)
 
         self.path_msg = None
@@ -102,7 +110,11 @@ class SplatPlanner2DNode(Node):
         binary_map = (data == 0).astype(np.uint8)  # free = 0, occupied = 100, unknown = -1
         free_ratio = np.mean(binary_map)
         print(free_ratio)
+<<<<<<< HEAD
         car_radius = 0.15  # meters (adjust to your car’s clearance)
+=======
+        car_radius = 0.3  # meters (adjust to your car’s clearance)
+>>>>>>> b76df322b7664ee8537085bffc7e3c6e13d95736
         inflation_radius = int(car_radius / msg.info.resolution)
 
         structure = np.ones((2 * inflation_radius + 1, 2 * inflation_radius + 1), dtype=np.uint8)
@@ -173,7 +185,10 @@ class SplatPlanner2DNode(Node):
 
         while open_set:
             current = heapq.heappop(open_set)
+<<<<<<< HEAD
             print("1")
+=======
+>>>>>>> b76df322b7664ee8537085bffc7e3c6e13d95736
             if is_goal(current):
                 path = []
                 while current:

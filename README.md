@@ -15,3 +15,5 @@ To generate 2D map from 3D dense pointcloud: use https://github.com/shubho-upenn
 ROS package with various scripts is in ros2_ws. Need to clone f1_tenth_gym_bridge in workspace and put in the mp files generated from above into appropriate folder.
 
 The various planner nodes generate a Path message, that Pure Pursuit can follow
+
+Credit to https://github.com/chengine/splatnav for creating the original methods for Semantic Planning for drones, which we adapted for the f1-tenth platform
